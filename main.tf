@@ -127,12 +127,29 @@ resource "aws_route_table_association" "a" {
   subnet_id      = aws_subnet.web-subnet-1.id
   route_table_id = aws_route_table.web-rt.id
 }
+resource "aws_nat_gateway" "example" {
+  allocation_id = aws_eip.example.id
+  subnet_id     = aws_subnet.web-subnet-1.id
 
+  tags = {
+    Name = "gw NAT"
+  }
+
+  # To ensure proper ordering, it is recommended to add an explicit dependency
+  # on the Internet Gateway for the VPC.
+  depends_on = [aws_internet_gateway.example]
+}
 resource "aws_route_table_association" "b" {
   subnet_id      = aws_subnet.web-subnet-2.id
   route_table_id = aws_route_table.web-rt.id
 }
+resource "aws_nat_gateway" "example" {
+  allocation_id = aws_eip.example.id
+  subnet_id     = aws_subnet.web-subnet-2.id
 
+  tags = {
+    Name = "gw NAT"
+  }
 #Create EC2 Instance
 resource "aws_instance" "webserver1" {
   ami                    = "ami-0d5eff06f840b45e9"
@@ -335,8 +352,8 @@ resource "aws_db_instance" "default" {
   instance_class         = "db.t2.micro"
   multi_az               = true
   db_name                = "mydb"
-  username               = "raham"
-  password               = "Rahamshaik#444555"
+  username               = "ghosh"
+  password               = "joyghosh#444555"
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.database-sg.id]
 }
